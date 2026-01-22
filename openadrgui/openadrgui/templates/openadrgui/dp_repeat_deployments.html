@@ -1,0 +1,61 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{% extends "base.html" %}
+{% block title %}
+    OpenADR GUI
+{% endblock title %}
+{% block content %}
+{% partialdef content inline %}
+    <c-title-bar title="Repeat Program Deployments">
+    <c-slot name="description">
+        <p class="text-sm text-base-content/70">
+            View the deployment history of repeated program deployments.
+        </p>
+    </c-slot>
+    </c-title-bar>
+    <div class="col gap-8">
+        <div class="bg-base-100 rounded-xl shadow-lg">
+            <div class="overflow-x-auto">
+            <c-table id="dp-schedule-deployment-table">
+                <c-slot name="headers">
+                    <th>Deployment Package Name</th>
+                    <th>Deployment Package ID</th>
+                    <th>Deployment Date</th>
+                    <th>Deployment Status</th>
+                    <th>Deployment Error Message</th>
+                </c-slot>
+                <c-slot name="rows">
+                    {% for deployment in deployments %}
+                        <tr>
+                            <td>
+                                <p>{{ deployment.program_deployment.program.program_name }}</p>
+                            </td>
+                            <td>
+                                {# stringformat:"i" to convert the UUID class to a string #}
+                                <code class="bg-base-200 px-2 py-1 rounded tooltip" data-tip="{{ deployment.program_deployment.program.id }}">{{ deployment.program_deployment.program.id|stringformat:"i"|slice:":16" }}…</code>
+                            </td>
+                            <td>
+                                <p>{{ deployment.deployment_date|date:"F j, Y, H:i" }}</p>
+                            </td>
+                            <td>
+                                <c-deployment-status-field :status="deployment.deployment_status" />
+                            </td>
+                            <td>
+                                <p>{{ deployment.deployment_error_message }}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </c-slot>
+                <c-slot name="empty">
+                    <p>No weekly deployments found. Enable "Weekly deployments" on a program to see the deployments here.</p>
+                </c-slot>
+            </c-table>
+            </div>
+        </div>
+    </div>
+{% endpartialdef content %}
+{% endblock content %}

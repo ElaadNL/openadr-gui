@@ -1,0 +1,21 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<nav aria-label="breadcrumbs" class="breadcrumbs">
+    <ul class="breadcrumb">
+      {% for url, label in breadcrumbs %}
+        {% if not url or forloop.counter == breadcrumbs_total %}
+          <li
+            class="{% if forloop.counter == breadcrumbs_total %}active{% endif %}{% if url %}link{% endif %}"
+            {% if forloop.counter == breadcrumbs_total %}aria-current="page"{% endif %}>
+              {{ label|safe }}
+          </li>
+        {% else %}
+          <li class="{% if url %}link{% endif %}"><c-link href="{{ url }}">{{ label|safe }}</c-link></li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+</nav>

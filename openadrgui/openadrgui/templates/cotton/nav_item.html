@@ -1,0 +1,23 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<c-vars :boosted="True" />
+<li
+    class="{% if '{{ path_name }}' in request.path %}active{% endif %}">
+    <!-- https://www.reddit.com/r/htmx/comments/125gha4/prevent_scrolling_on_hxboost/ -->
+    {% if boosted is True %}
+        <c-link class="link" href="{% url path_name %}" :attrs="attrs">
+            {{ slot }}
+        </c-link>
+    {% else %}
+        <a class="link"
+            {% if path_name %} href="{% url path_name %}" {% endif %}
+            {{ attrs }}>
+            {{ slot }}
+        </a>
+    {% endif %}
+
+</li>

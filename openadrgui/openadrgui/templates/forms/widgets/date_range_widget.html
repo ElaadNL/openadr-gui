@@ -1,0 +1,102 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{% load widget_tweaks %}
+{% load template_filters %}
+{# From: https://daisyui.com/components/calendar/#cally-date-picker-example. Use modal for better Chrome support. Remove anchoring for easier positioning #}
+<script type="module" src="https://unpkg.com/cally"></script>
+<div class="col gap-2">
+    <div x-data="{
+        calendarId: $id('calendar'),
+        _startDate: null,
+        _endDate: null,
+        {% block x_data_extra %}{% endblock x_data_extra %}
+
+        // Use getters and setters to bind to hidden inputs with strings but use Date objects internally.
+        // Uses x-model.fill to bind to hidden inputs and keep local state when reloading the page.
+        get startDate() {
+            return this._startDate ? this._startDate.toISOString().slice(0, 10) : '';
+        },
+        set startDate(val) {
+            this._startDate = val ? new Date(val) : null;
+        },
+
+        get endDate() {
+            return this._endDate ? this._endDate.toISOString().slice(0, 10) : '';
+        },
+        set endDate(val) {
+            this._endDate = val ? new Date(val) : null;
+        },
+
+        get displayText() {
+            if (this._startDate && this._endDate) {
+                let startText = this._startDate.toLocaleDateString('nl-NL');
+                let endText = this._endDate.toLocaleDateString('nl-NL');
+                {% block display_text_extra %}{% endblock display_text_extra %}
+                return startText + ' - ' + endText;
+            }
+            return '{{ widget.attrs|get_dict_item:'empty_message' }}';
+        },
+        clearValues() {
+            document.getElementById(this.calendarId).value = '';
+            this.startDate = '';
+            this.endDate = '';
+            {% block clear_values_extra %}{% endblock clear_values_extra %}
+        }
+        }"
+        {# Allow Django and browser to set value via hidden input #}
+        id="{{ widget.id_for_label }}"
+        aria-describedby="{{ widget.id_for_label }}_helptext"
+        class="row gap-4">
+            <div class="col gap-4 flex-1">
+                <c-modal close_on_outside_click>
+                    <c-slot name="button">
+                        <button
+                        {{ widget.attrs|get_dict_item:'disabled'|yesno:'disabled,' }}
+                        type="button"
+                        @click.prevent="showModal"
+                        class="input w-full {% if widget.errors %} input-error {% else %} input-border {% endif %}"
+                        aria-invalid="{% if widget.errors|length %}true{% else %}false{% endif %}"
+                        aria-describedby="{{ widget.attrs|get_dict_item:'aria-describedby' }}">
+                            <span class="bi bi-calendar-date"></span>
+                            <!-- min-w-72 is to prevent the calendar from shrinking when the text is empty: it is the width that can hold a full date -->
+                            <span class="min-w-72 w-full" x-text="displayText"></span>
+                        </button>
+                    </c-slot>
+                    <c-slot name="modal_content">
+                        <div class="flex flex-col items-center w-min">
+                            <calendar-range
+                                min="{{ widget.attrs|get_dict_item:'min-date' }}"
+                                max="{{ widget.attrs|get_dict_item:'max-date' }}"
+                                class="cally"
+                                :id="calendarId"
+                                @change="
+                                    const [start, end] = $event.target.value.split('/');
+                                    startDate = start;
+                                    endDate = end;
+                                    ">
+                                    <svg aria-label="Previous" class="fill-current size-4" slot="previous" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg>
+                                    <svg aria-label="Next" class="fill-current size-4" slot="next" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg>
+                                    <calendar-month></calendar-month>
+                                    <calendar-month offset="1"></calendar-month>
+                            </calendar-range>
+                            <div class="p-4 w-full">
+                                {% block extra_content %}{% endblock extra_content %}
+                            </div>
+                        </div>
+                    </c-slot>
+                </c-modal>
+
+                {# This is a hidden input that stores the date in ISO format #}
+                <input type="hidden" name="{{ widget.subwidgets.0.name }}" value="{{ widget.subwidgets.0.value|default:'' }}" x-model.fill="startDate">
+                <input type="hidden" name="{{ widget.subwidgets.1.name }}" value="{{ widget.subwidgets.1.value|default:'' }}" x-model.fill="endDate">
+            </div>
+            <button
+            class="btn btn-outline"
+            {{ widget.attrs|get_dict_item:'disabled'|yesno:'disabled,' }}
+            @click.prevent="clearValues()"><i class="bi bi-x"></i></button>
+    </div>
+</div>

@@ -1,0 +1,168 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="col gap-8">
+    {% if deployment_package %}
+        <c-title-bar
+        title="{{ title }}"
+        link_url="{% url url_prefix|add:'programs-create' %}"
+        link_text="New Program"
+        >
+        <c-slot name="description">
+            <p class="text-sm text-base-content/70">
+                {{ description }}
+            </p>
+        </c-slot>
+        </c-title-bar>
+    {% else %}
+        <c-title-bar
+        title="{{ title }}"
+        >
+        <c-slot name="description">
+            <p class="text-sm text-base-content/70">
+                {{ description }}
+            </p>
+        </c-slot>
+        </c-title-bar>
+    {% endif %}
+    <div id="dashboard-cards"
+    class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        {% partialdef dashboard-cards inline %}
+            <c-dashboard-card label="Total Programs" value="{{ total_count }}" />
+        {% endpartialdef dashboard-cards %}
+    </div>
+    {# programs-tables contains both tables, programs-table only the main table #}
+    {% partialdef programs-tables inline %}
+        <div id="{{ deployment_package|yesno:'dp-programs-tables,programs-tables' }}" class="col gap-16">
+            <div class="bg-base-100 rounded-xl shadow-lg">
+                <div class="overflow-x-auto">
+                    {% partialdef programs-table inline %}
+                        <c-table>
+                            <c-slot name="headers">
+                                <th>Name</th>
+                                <th>ID</th>
+                                <th>Retailer</th>
+                                <th>Type</th>
+                                <th>Country</th>
+                                <th>Interval</th>
+                                <th>To events</th>
+                                {% if deployment_package %}
+                                    <th>Deploy</th>
+                                    <th>Schedule deployment</th>
+                                    <th>Last Deployment</th>
+                                {% endif %}
+                                <th>Actions</th>
+                            </c-slot>
+                            <c-slot name="rows">
+                                {% for program in programs %}
+                                    <tr>
+                                        <td>
+                                            <p class="font-medium">{{ program.program_name }}</p>
+                                            <p class="text-sm text-base-content/70">{{ program.program_long_name }}</p>
+                                        </td>
+                                        <td>
+                                            <code class="bg-base-200 px-2 py-1 rounded tooltip" data-tip="{{ program.id }}">{{ program.id|slice:":16" }}…</code>
+                                        </td>
+                                        <td>
+                                            <p>{{ program.retailer_name }}</p>
+                                            <p class="text-sm text-base-content/70">{{ program.retailer_long_name }}</p>
+                                        </td>
+                                        <td>
+                                            <p>{{ program.program_type }}</p>
+                                        </td>
+                                        <td>
+                                            <c-country-field
+                                                :country="program.country"
+                                                :flag="program.flag"
+                                                :country_long_name="program.country_long_name"
+                                                :subdivision_long_name="program.subdivision_long_name"
+                                                :principal_subdivision="program.principal_subdivision" />
+                                        </td>
+                                        <td>
+                                            <c-interval-period-field :interval_period="program.interval_period" />
+                                        </td>
+                                        <td>
+                                            <c-link href="{% url url_prefix|add:'events' program.id %}"
+                                            class="btn btn-sm btn-outline"
+                                            title="To Events">
+                                                <span class="text-xs">To Events</span>
+                                            </c-link>
+                                        </td>
+                                        {% if deployment_package %}
+                                        <td>
+                                            <button hx-post="{% url 'dp-deploy-program' program.id %}"
+                                            class="btn btn-sm btn-outline"
+                                            title="Deploy">
+                                                <span class="text-xs">Deploy</span>
+                                                <i class="bi bi-arrow-repeat animate-spin htmx-indicator"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <c-modal>
+                                                <c-slot name="button">
+                                                    <button @click.prevent="showModal" class="btn btn-sm btn-outline">
+                                                        <i class="bi bi-arrow-repeat"></i>
+                                                        Schedule deployment
+                                                    </button>
+                                                </c-slot>
+                                                <c-slot name="modal_content">
+                                                    {% partialdef schedule-deployment-form inline %}
+                                                        {% url 'dp-schedule-deployment' program.id as schedule_deployment_url %}
+                                                        <c-schedule-deployment-form id="deploy" :url="schedule_deployment_url"></c-schedule-deployment-form>
+                                                    {% endpartialdef schedule-deployment-form %}
+                                                </c-slot>
+                                            </c-modal>
+                                        </td>
+                                        <td>
+                                            {% if program.deployment_status %}
+                                                <c-link href="{% url 'dp-scheduled-deployments' %}">
+                                                    <c-deployment-status-field :status="program.deployment_status" />
+                                                </c-link>
+                                            {% else %}
+                                                <div class="flex justify-center items-center">
+                                                    <p> None</p>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        {% endif %}
+                                        <td>
+                                            <c-actions-field
+                                                :field="program"
+                                                item_name="Program"
+                                                :name="program.program_name"
+                                                edit_route="{% url url_prefix|add:'programs-edit' program.id %}"
+                                                delete_route="{% url url_prefix|add:'programs-delete' program.id %}"
+                                                hx_target="#{{ deployment_package|yesno:'dp-programs-tables,programs-tables' }}" />
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </c-slot>
+                            <c-slot name="empty">
+                                {% if deployment_package %}
+                                    <p>No Programs found. <c-link class="link" href="{% url url_prefix|add:'programs-create' %}">Create one now</c-link></p>
+                                {% else %}
+                                    <p>No Programs found. Create a new program in the deployment package and deploy it to the VTN.</p>
+                                {% endif %}
+                            </c-slot>
+                        </c-table>
+                    {% endpartialdef programs-table %}
+                </div>
+            </div>
+            <div class="col gap-4">
+                {% if not deployment_package %}
+                <c-scheduled-deployment-warning item_names="All programs below"/>
+                <div class="bg-base-100 rounded-xl shadow-lg">
+                    <div class="overflow-x-auto border-warning border-2 rounded-xl">
+                        {% with programs=deployed_programs %}
+                            {% include "partials/programs-partial.html#programs-table" %}
+                        {% endwith %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        {% endpartialdef programs-tables %}
+    </div>
+</div>

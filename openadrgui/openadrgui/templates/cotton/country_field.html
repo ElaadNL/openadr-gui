@@ -1,0 +1,22 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="flex items-center gap-2">
+    {% if country %}
+        {% if flag %}
+            <div class="flex items-center gap-2 cursor-default tooltip" data-tip="{{ country_long_name }}">
+                <p class="text-2xl">{{ flag|default:country }}</p>
+            </div>
+        {% else %}
+            <p class="text-2xl">{{ flag|default:country }}</p>
+        {% endif %}
+        {% if subdivision_long_name %}
+            <p>{{ subdivision_long_name|default:principal_subdivision }}</p>
+        {% endif %}
+    {% else %}
+        <p>None</p>
+    {% endif %}
+</div>

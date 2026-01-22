@@ -1,0 +1,22 @@
+{
+    "name": "openadrgui-dev",
+    "dockerComposeFile": "docker-compose.dev.yml",
+    "service": "openadrgui-dev",
+    "shutdownAction": "stopCompose",
+    "workspaceFolder": "/workspace/",
+    "remoteUser": "root",
+    "overrideCommand": true,
+    "postAttachCommand": "uv sync && npm install",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "adrianwilczynski.alpine-js-intellisense",
+                "matthewpi.caddyfile-support",
+                "tamasfe.even-better-toml",
+                "ms-azuretools.vscode-docker",
+                "otovo-oss.htmx-tags",
+                "charliermarsh.ruff"
+            ]
+        }
+    }
+}

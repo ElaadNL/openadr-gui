@@ -1,0 +1,37 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{% load widget_tweaks %}
+{# To open and close the modal, use the showModal and closeModal functions. #}
+{# Default behaviour: closes when the response is successful. When response is an error (see HTMX config in base.html), the modal is not closed. #}
+{# If you want to change this behaviour, add a feature that uses an HX-Trigger-After-Settle header/event to close the modal. #}
+<div x-data="{
+    showModal: () => $el.querySelector('dialog').showModal(),
+    closeModal: () => $el.querySelector('dialog').close()
+}">
+    {% if button %}
+        {{ button }}
+    {% else %}
+        <button @click.prevent="showModal" class="btn btn-primary" {{ attrs }}>
+            {{ button_icon }}
+            {% if title %}
+                <span>{{ title }}</span>
+            {% endif %}
+        </button>
+    {% endif %}
+    <dialog class="modal" @htmx:after-request.window="(res) => {
+        if (res.detail.xhr.status !== 422 || {{ close_on_client_error|yesno:"true,false" }}) {
+            $el.close();
+        }
+    }"{% if open %}open{% endif %}>
+        <div {{ attrs }} {% if close_on_outside_click %}@mousedown.outside="closeModal"{% endif %} class="modal-box w-auto flex flex-col gap-2 text-left">
+            {% if title %}
+                <h3>{{ title }}</h3>
+            {% endif %}
+            {{ modal_content }}
+        </div>
+    </dialog>
+</div>

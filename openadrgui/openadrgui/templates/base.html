@@ -1,0 +1,223 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!DOCTYPE html>
+<html lang="en" class="h-screen">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="OpenADR GUI">
+        <meta name="keywords"
+              content="OpenADR, GUI, OpenADR GUI, OpenLEADR, OpenADR 3.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {# Allows swapping for errors, since the server needs to do an OOB swap for the update messages partial #}
+        {# To prevent the default error page from being swapped, the HtmxErrorMiddleware sets the HX-Reswap none header #}
+        <meta
+            name="htmx-config"
+            content='{
+                "responseHandling": [
+                    {"code": "204", "swap": false},
+                    {"code": "[23]..", "swap": true},
+                    {"code": "422", "swap": true, "error": false},
+                    {"code": "[45]..", "swap": true, "error": true},
+                    {"code": "...", "swap": true}
+                ]
+            }'
+        />
+        <title>
+            {% block title %}
+                Dashboard
+            {% endblock title %}
+        </title>
+        <!-- ALpineJS and HTMX-->
+        <script defer
+                src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"
+                integrity="sha384-X9kJyAubVxnP0hcA+AMMs21U445qsnqhnUF8EBlEpP3a42Kh/JwWjlv2ZcvGfphb"
+                crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/htmx.org@2.0.4"
+                integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
+                crossorigin="anonymous"></script>
+        <!-- Path Params plugin: https://github.com/bigskysoftware/htmx-extensions/blob/main/src/path-params/README.md -->
+        <script defer src="https://unpkg.com/htmx-ext-path-params@2.0.0/path-params.js"
+            integrity="sha384-Wf31Ly/JGAYYvGNZ/qNb9aY7RiEjj+UwckUgBuAwzHRCemd6RoSmDXaL6LL6FbLi"
+            crossorigin="anonymous"></script>
+
+        {# AJAX Header plugin: https://github.com/bigskysoftware/htmx-extensions/blob/main/src/ajax-header/README.md #}
+        {# Used to trigger this behavior: https://mozilla-django-oidc.readthedocs.io/en/stable/xhr.html #}
+        {# See: https://github.com/mozilla/mozilla-django-oidc/issues/557 #}
+        <script
+            src="https://unpkg.com/htmx-ext-ajax-header@2.0.1/ajax-header.js"
+            integrity="sha384-jou9KAhkaWPcXiHr2KH0ghHgB0viUmwYkf0/4AZ4rRDzOXsiwT+O/X7ifReDWFDT"
+            crossorigin="anonymous"></script>
+
+        <!-- Handle authentication redirects for HTMX requests -->
+        <script>
+            document.addEventListener('htmx:beforeSwap', function(evt) {
+                // Handle 403 responses with refresh_url header (session expired)
+                if (evt.detail.xhr.status === 403) {
+                    // Stop the swap from happening and navigate to the oauth login page
+                    evt.preventDefault();
+                    const refreshUrl = evt.detail.xhr.getResponseHeader('refresh_url');
+                    if (refreshUrl) {
+                        // Redirect to oauth login page to refresh authentication
+                        window.location.href = refreshUrl;
+                        return;
+                    }
+                    console.error('No refresh_url found');
+                }
+            });
+        </script>
+        {% load compress %}
+        {% load static %}
+        <!-- Chart.js and Luxon -->
+        <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js" integrity="sha256-Lye89HGy1p3XhJT24hcvsoRw64Q4IOL5a7hdOflhjTA=" crossorigin="anonymous"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/luxon@3.6.1/build/global/luxon.min.js" integrity="sha256-UA/r5Oi3pNGYgJlnmZuqXkeXYQRLqyHxFGrFuUDZUXA=" crossorigin="anonymous"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.umd.min.js" integrity="sha256-qk+I9RaF57Ium9VLcn0ZYWjuhbjOXOCCwBl+xnaXa1s=" crossorigin="anonymous"></script>
+        <!-- Add Favicon -->
+        <link rel="apple-touch-icon"
+              sizes="180x180"
+              href="{% static 'favicon/apple-touch-icon.png' %}">
+        <link rel="icon"
+              type="image/png"
+              sizes="32x32"
+              href="{% static 'favicon/favicon-32x32.png' %}">
+        <link rel="icon"
+              type="image/png"
+              sizes="16x16"
+              href="{% static 'favicon/favicon-16x16.png' %}">
+        <link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
+        <link rel="icon"
+              type="image/png"
+              sizes="192x192"
+              href="{% static 'favicon/android-chrome-192x192.png' %}">
+        <link rel="icon"
+              type="image/png"
+              sizes="512x512"
+              href="{% static 'favicon/android-chrome-512x512.png' %}">
+        <meta name="theme-color" content="#007ea4">
+        <!-- Add Google Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Exo:wght@400;500;600;700&family=Montserrat:wght@400;500;600&display=swap"
+              rel="stylesheet">
+        <!-- Add Bootstrap Icons -->
+        <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link rel="stylesheet" href="{% static 'css/output.css' %}">
+        {% block extra_head %}
+        {% endblock extra_head %}
+    </head>
+    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' hx-ext="path-params,ajax-header" class="h-screen">
+        {# djlint:off H021 #}
+        {% load template_filters %}
+        {% load view_breadcrumbs %}
+        <div id="messages"
+            x-data="{
+                showErrorMessage() {
+                    // Shows error message when the browser cannot connect to the server
+                    const messageDiv = this.$refs.messageTemplate.content.cloneNode(true);
+                    messageDiv.querySelector('span').textContent = 'Cannot connect to server';
+                    document.getElementById('messages').appendChild(messageDiv);
+                }
+            }"
+            class="z-50 fixed inset-0 flex flex-col-reverse items-end justify-start h-screen w-screen"
+            style="pointer-events:none"
+            @htmx:send-error.window="showErrorMessage">
+            <template x-ref="messageTemplate">
+                {% create_object object_str_field="message" tags="error" message="//replace-me//" as template_message %}
+                {% include "partials/message-partial.html" with message=template_message %}
+            </template>
+            {% include "partials/messages-list-partial.html" %}
+        </div>
+        {# djlint:on #}
+        <div class="h-full drawer">
+            <input id="nav-drawer" type="checkbox" class="drawer-toggle" />
+            <div class="h-full drawer-content flex flex-col">
+                <!-- Navbar -->
+                <div class="navbar gap-2 bg-base-300 w-full px-5">
+                    <div class="flex-none lg:hidden">
+                        <label for="nav-drawer"
+                               aria-label="open sidebar"
+                               class="btn btn-ghost text-white bg-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 class="inline-block h-6 w-6 stroke-current">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </label>
+                    </div>
+                    <div class="flex-1 px-3">
+                        {% block breadcrumbs %}
+                            {% render_breadcrumbs %} {# Optionally provide a custom template e.g {% render_breadcrumbs "view_breadcrumbs/bootstrap5.html" %} #}
+                        {% endblock breadcrumbs %}
+                    </div>
+                    <div class="hidden flex-none lg:block">
+                        <ul class="menu menu-horizontal p-0">
+                            {% partialdef nav-items inline %}
+                                <c-nav-item path_name="index">
+                                    <i class="bi bi-hdd-network"></i>
+                                    VENs
+                                </c-nav-item>
+                                <c-nav-item path_name="programs">
+                                    <i class="bi bi-layout-text-sidebar"></i>
+                                    Programs
+                                </c-nav-item>
+                                {% if user.is_authenticated %}
+                                    <li>
+                                        <details x-data @click.outside="$el.open = false">
+                                            <summary>
+                                                <i class="bi bi-person"></i>
+                                                <p>{{ user.email }}</p>
+                                            </summary>
+                                            <ul>
+                                                <li>
+                                                    <form action="{% url 'oidc_logout' %}" method="post">
+                                                        {% csrf_token %}
+                                                        <i class="bi bi-box-arrow-right"></i>
+                                                        <input type="submit" value="logout">
+                                                      </form>
+                                                </li>
+                                            </ul>
+                                        </details>
+                                    </li>
+                                {% else %}
+                                    {# HTMX cannot handle a redirect to the login page, so we use a normal link #}
+                                    <c-nav-item :boosted=False path_name="login">
+                                        <i class="bi bi-box-arrow-in-right"></i>
+                                        Login
+                                    </c-nav-item>
+                                {% endif %}
+                                {# Icons: event: bi-bell, report: bi-journal-text, subscription: bi-link#}
+                            {% endpartialdef nav-items %}
+                        </ul>
+                    </div>
+                </div>
+                <!-- Main Content -->
+                <main class="h-full flex-1">
+                    <div class="h-full p-5" id="content">
+                        {% block content %}
+                            <!-- Page-specific content will go here -->
+                        {% endblock content %}
+                    </div>
+                </main>
+            </div>
+            <div x-data class="drawer-side">
+                <label for="nav-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+                <div class="menu bg-base-200 min-h-full w-80 p-4 gap-4">
+                    <!-- Sidebar content here -->
+                    <div class="col items-center">
+                        <div class="col items-center w-1/2">
+                            <h4 class="text-primary">OpenADR GUI</h4>
+                        </div>
+                    </div>
+                    <ul class="menu menu-vertical w-full *:p-2">
+                        {% include "base.html#nav-items" %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

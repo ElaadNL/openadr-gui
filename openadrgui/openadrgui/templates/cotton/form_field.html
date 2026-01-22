@@ -1,0 +1,31 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{% load widget_tweaks %}
+<c-vars :render_labels=True />
+
+<div class="col gap-2">
+    {% if render_labels is True %}
+        <label for="{{ field.id_for_label }}">
+            <span>{{ field.label }}</span>
+        </label>
+    {% endif %}
+    {% if not slot %}
+        <div class="relative">
+            {% render_field field %}
+        </div>
+    {% else %}
+        {{ slot }}
+    {% endif %}
+    <ol>
+        {% for error in field.errors %}<li class="text-error text-sm">{{ error|escape }}</li>{% endfor %}
+    </ol>
+    {% if field.help_text and render_labels is True %}
+        <label class="label text-sm" id="{{ field.id_for_label }}_helptext">
+            <span class="whitespace-normal">{{ field.help_text }}</span>
+        </label>
+    {% endif %}
+</div>

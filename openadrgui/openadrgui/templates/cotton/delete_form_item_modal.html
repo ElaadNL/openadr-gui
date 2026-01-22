@@ -1,0 +1,50 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<c-modal title="Delete {{ item_name }}" close_on_client_error>
+    <c-slot name="button">
+        {% if button %}
+            {{ button }}
+        {% else %}
+            <button @click.prevent="showModal" class="btn btn-sm btn-outline btn-error rounded-l-none">
+                <i class="bi bi-trash"></i>
+            </button>
+        {% endif %}
+    </c-slot>
+
+    <c-slot name="modal_content">
+        <div class="alert alert-error mb-4">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Warning:</strong> This action cannot be undone.
+        </div>
+        <p>Are you sure you want to delete the {{ item_name }}: "{{ name }}"?</p>
+
+        {% if warning_description %}
+            <p>{{ warning_description }}</p>
+        {% else %}
+
+        {% endif %}
+        <div class="row justify-end">
+            <div class="row gap-4">
+                <button type="button"
+                        @click.prevent="closeModal"
+                        class="btn">Cancel</button>
+                {% if delete_button %}
+                    {{ delete_button }}
+                {% else %}
+                    <button type="button"
+                            hx-disabled-elt="this"
+                            hx-delete="{{ delete_route }}"
+                            hx-target="{{ hx_target|default:'closest table' }}"
+                            class="btn btn-error">
+                        <i class="bi bi-trash me-1"></i>
+                            Delete
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </c-slot>
+</c-modal>

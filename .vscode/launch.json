@@ -1,0 +1,33 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Python Debugger: Django",
+            "type": "debugpy",
+            "request": "launch",
+            "args": [
+                "runserver"
+            ],
+            "justMyCode": true,
+            "django": true,
+            "autoStartBrowser": false,
+            "program": "${workspaceFolder}/openadrgui/manage.py"
+        },
+        {
+            "name": "Python Debugger: Huey",
+            "type": "debugpy",
+            "request": "launch",
+            "args": [
+                "run_huey"
+            ],
+            "justMyCode": true,
+            "django": true,
+            "autoStartBrowser": false,
+            "program": "${workspaceFolder}/openadrgui/manage.py"
+        }
+    ]
+}

@@ -1,0 +1,42 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{% extends "base.html" %}
+{% block title %}
+    Delete VEN Connection
+{% endblock title %}
+{% block content %}
+    {% partialdef content inline %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Delete VEN Connection</h1>
+    </div>
+    <div class="card dashboard-card">
+        <div class="card-body">
+            <div class="alert alert-danger mb-4">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>Warning:</strong> This action cannot be undone.
+            </div>
+            <p class="mb-4">
+                Are you sure you want to delete the VEN connection "{{ object.name }}"?
+                {% if object.party_name %}
+                    <br>
+                    <small class="text-muted">Party: {{ object.party_name }}</small>
+                {% endif %}
+            </p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i>
+                        Delete Connection
+                    </button>
+                    <c-link href="{% url 'index' %}" class="btn btn-outline-secondary">Cancel</c-link>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endpartialdef content %}
+{% endblock content %}

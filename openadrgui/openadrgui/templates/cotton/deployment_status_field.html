@@ -1,0 +1,25 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="flex justify-center items-center">
+    {% if status == 'SUCCESS' %}
+        <span class="tooltip" data-tip="Success">
+            <i class="bi bi-check-circle-fill text-green-500 text-2xl"></i>
+        </span>
+    {% elif status == 'FAILED' %}
+        <span class="tooltip" data-tip="Failed">
+            <i class="bi bi-x-circle-fill text-red-500 text-2xl"></i>
+        </span>
+    {% elif status == 'SKIPPED' %}
+        <span class="tooltip" data-tip="Skipped">
+            <i class="bi bi-chevron-double-right text-blue-500 text-2xl"></i>
+        </span>
+    {% elif status == 'IN_PROGRESS' %}
+        <span class="tooltip" data-tip="In Progress">
+            <i class="bi bi-arrow-repeat text-blue-500 text-2xl"></i>
+        </span>
+    {% endif %}
+</div>

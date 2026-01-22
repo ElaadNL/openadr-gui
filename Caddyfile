@@ -1,0 +1,38 @@
+(common) {
+  header /* {
+    X-XSS-Protection "1; mode=block"
+    X-Content-Type-Options nosniff
+    -Server
+  }
+
+  header /media/* {
+    Cache-Control "public, max-age=315360000"
+  }
+
+  encode zstd gzip
+}
+
+localhost {
+  import common
+
+  @api {
+		path /api/* /api
+	}
+
+  handle @api {
+    uri strip_prefix /api
+    reverse_proxy vtn:3000
+  }
+
+  handle /static/* {
+    uri strip_prefix /static
+    file_server {
+      precompressed
+      root /app/openadrgui/static
+    }
+  }
+
+  handle {
+    reverse_proxy openadrgui:80
+  }
+}

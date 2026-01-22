@@ -1,0 +1,94 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{% extends "base.html" %}
+{% block extra_head %}
+{% endblock extra_head %}
+{% load widget_tweaks %}
+{% block title %}
+    Event Targets
+{% endblock title %}
+{% block content %}
+    {% partialdef content inline %}
+    {% if program_is_deployed %}
+        <c-scheduled-deployment-confirm-modal item_names="targets" program_name="{{ program_name }}" />
+    {% endif %}
+    <div class="col gap-8">
+        <div class="bg-base-100 rounded-xl shadow-lg max-w-prose mx-auto">
+            <div class="overflow-x-auto">
+                {% partialdef targets-table inline %}
+                    <form
+                        {# I know that this is not the correct verb, but Django doesnt support PUT for form requests. #}
+                        hx-post="{{ request.path }}"
+                        novalidate
+                        id="targets-form"
+                        {# Prevent browser from keeping the previous values. #}
+                        autocomplete="off">
+                        {% csrf_token %}
+                        {{ formset.management_form }}
+                        <c-table id="targets-table">
+                            <c-slot name="headers" class="min-w-2">
+                                {% for field in formset.extra_forms.0 %}
+                                    <th>{{ field.label }} <span class="text-error">{{ field.required|yesno:"*,*" }}</span></th>
+                                {% endfor %}
+                                <th>Delete</th>
+                            </c-slot>
+                            <c-slot name="rows">
+                                {% for form in formset %}
+                                    {% partialdef targets-form inline %}
+                                        <tr>
+                                            {% for field in form %}
+                                                <td>
+                                                    <c-form-field render_labels=False :field=field />
+                                                </td>
+                                            {% endfor %}
+                                            <td>
+                                                <button x-data @click.prevent="$el.closest('tr').remove();"
+                                                    class="btn btn-sm btn-outline btn-error">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endpartialdef targets-form %}
+                                {% endfor %}
+                            </c-slot>
+                        </c-table>
+                        <div class="flex flex-col gap-4 p-4">
+                            <c-form-errors :form=form />
+                            <div class="flex gap-2 justify-between">
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    hx-get="{{ targets_form_url }}"
+                                    hx-target="#targets-table > tbody"
+                                    hx-swap="beforeend"
+                                    x-data="{ targetCounter: 0 }"
+                                    @htmx:before-swap.window="(evt) => {
+                                        // Replace the __prefix__ with a new unique prefix.
+                                        evt.detail.serverResponse = evt.detail.serverResponse.replaceAll('__prefix__', `{{ dynamic_form_id_prefix }}${targetCounter}`);
+                                        targetCounter++;
+                                    }">
+                                    <i class="bi bi-plus-circle"></i>
+                                    Add target
+                                </button>
+                                <div>
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary">
+                                        Save targets
+                                        <i class="bi bi-arrow-repeat animate-spin htmx-indicator"></i>
+                                    </button>
+                                    <c-link href="{{ back_url }}" class="btn btn-ghost">Back</c-link>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                {% endpartialdef targets-table %}
+            </div>
+        </div>
+    </div>
+{% endpartialdef content %}
+{% endblock content %}

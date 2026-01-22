@@ -1,0 +1,26 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{% extends "base.html" %}
+
+{% block title %}Server Error (500){% endblock title %}
+
+{% block content %}
+<div class="col gap-4 items-center justify-center h-full">
+    <i class="bi bi-exclamation-triangle text-4xl text-error"></i>
+    <h2 class="text-center text-3xl font-extrabold text-gray-900">
+        500 - Server Error
+    </h2>
+    <p class="text-center text-sm text-gray-600">
+        Something went wrong. Please try again or contact support if the issue persists.
+    </p>
+    <div class="text-center">
+        <a class="link " href="{% url 'index' %}">
+            Return to Home
+        </a>
+    </div>
+</div>
+{% endblock content %}

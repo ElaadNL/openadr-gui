@@ -1,0 +1,12 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{# Use full class names to make sure Tailwind CLI can detect and include them in the build #}
+{% with default_delay_class="animate-delay-[5000ms]" click_delay_class="animate-delay-[1000ms]" %}
+    {% for message in messages %}
+        {% include "partials/message-partial.html" %}
+    {% endfor %}
+{% endwith %}

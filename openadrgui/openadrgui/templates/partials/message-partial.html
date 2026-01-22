@@ -1,0 +1,48 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{# Use full class names to make sure Tailwind CLI can detect and include them in the build #}
+{% with default_delay_class="animate-delay-[5000ms]" click_delay_class="animate-delay-[1000ms]" %}
+        {# djlint:off #}
+        <div
+                x-data
+                @click="$el.classList.replace('{{ default_delay_class }}', '{{ click_delay_class }}')"
+                @animationend="$el.remove()"
+                class="bg-white relative rounded-md shadow-md w-96 h-30 mb-4 mr-6 flex items-center gap-3
+                {{ default_delay_class }} animate-fade-left animate-reverse"
+                style="pointer-events:all">
+
+            <div class="
+                w-2
+                h-full
+                {% if message.tags == 'success' %}
+                    bg-success
+                {% elif message.tags == 'info' %}
+                    bg-info
+                {% elif message.tags == 'warning' %}
+                    bg-warning
+                {% elif message.tags == 'error' %}
+                    bg-error
+                {% endif %}
+            ">
+            </div>
+            <i class="
+                bi
+                text-lg
+                {% if message.tags == 'success' %}
+                    bi-check-circle-fill text-success
+                {% elif message.tags == 'info' %}
+                    bi-info-circle-fill text-info
+                {% elif message.tags == 'warning' %}
+                    bi-exclamation-triangle-fill text-warning
+                {% elif message.tags == 'error' %}
+                    bi-exclamation-circle-fill text-error
+                {% endif %}
+            "></i>
+            <span>{{ message }}</span>
+        </div>
+    {# djlint:on #}
+{% endwith %}

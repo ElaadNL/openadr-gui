@@ -1,0 +1,16 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{# From: https://daisyui.com/components/calendar/#cally-date-picker-example. Remove anchoring for easier positioning #}
+<div x-data="{
+    popover_id: $id('popover_id'),
+    popover_button_id: $id('popover_button_id')
+    }">
+        {{ button }}
+        <div popover :id="popover_id" class="dropdown bg-base-100 rounded-box shadow-lg" {{ attrs }}>
+            {{ popover_content }}
+        </div>
+</div>

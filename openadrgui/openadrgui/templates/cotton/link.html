@@ -1,0 +1,18 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{# https://www.reddit.com/r/htmx/comments/125gha4/prevent_scrolling_on_hxboost/ #}
+{# Change the settle duration to be slightly longer than the longest animation duration #}
+{# The HTMX window:top scroll is too slow, so we do it manually instead #}
+
+<a
+    hx-boost="true"
+    hx-swap="innerHTML show:no-scroll settle:600ms"
+    @htmx:before-on-load.window="window.scrollTo({top: 0})"
+    {{ attrs }}
+    >
+    {{ slot }}
+</a>

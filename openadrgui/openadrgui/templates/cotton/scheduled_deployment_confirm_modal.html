@@ -1,0 +1,55 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div x-data="{
+    programNameInput: '',
+    programName: '{{ program_name }}',
+    canSubmit() { return this.programNameInput === this.programName; },
+    closeModal() { $el.querySelector('dialog').close(); }
+}" x-init="$nextTick(() => $el.querySelector('dialog').showModal())">
+    <dialog class="modal">
+        <div class="modal-box w-auto flex flex-col gap-6 text-left">
+            <div class="row gap-4 items-center">
+                <i class="bi bi-exclamation-triangle-fill text-4xl text-warning self-center" aria-label="Warning"></i>
+                <h3 class="text-lg font-bold">
+                    Deployed Program
+                </h3>
+            </div>
+            <div class="col gap-6">
+                <div class="col gap-2">
+                    <p>
+                        The {{ item_names }} for this event are part of a program with a scheduled deployment: <strong>{{ program_name }}</strong>.
+                    </p>
+                    <p>
+                        Modifying these can break the scheduled deployment, which can cause problems for VENs. Please be careful.
+                    </p>
+                </div>
+                <div class="col gap-2">
+                    <label>
+                        <span>Type "<strong>{{ program_name }}</strong>" to confirm</span>
+                    </label>
+                    <input
+                        type="text"
+                        x-model="programNameInput"
+                        placeholder="Enter program name"
+                        class="input input-bordered w-full"
+                        autocomplete="off"
+                    />
+                    <div class="row gap-2 justify-end">
+                        <c-link class="btn btn-ghost" href="{% url 'programs' %}">Cancel</c-link>
+                        <button
+                            @click="if(canSubmit()) { closeModal(); }"
+                            :disabled="!canSubmit()"
+                            class="btn btn-primary"
+                            :class="{ 'btn-disabled': !canSubmit() }">
+                            I understand
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+</div>

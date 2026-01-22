@@ -1,0 +1,16 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{% load template_filters %}
+{% if interval_period %}
+    <p>Start: {{ interval_period.start|date:"F j, Y, H:i" }}</p>
+    <p>End: {{ interval_period.start|add_time:interval_period.duration|date:"F j, Y, H:i" }}</p>
+    {% if interval_period.randomize_start %}
+        <p>Randomize: {{ interval_period.randomize_start }}</p>
+    {% endif %}
+{% else %}
+    <p>None</p>
+{% endif %}

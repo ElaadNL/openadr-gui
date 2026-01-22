@@ -1,0 +1,75 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{% extends "base.html" %}
+{% block title %}
+    OpenADR GUI
+{% endblock title %}
+{% block content %}
+{% partialdef content inline %}
+    <div class="col gap-8">
+        <c-title-bar title="Resources" link_url="{% url url_prefix|add:'resources-create' id %}" link_text="New Resource" />
+        <div id="dashboard-cards"
+             class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {% partialdef dashboard-cards inline %}
+                <c-dashboard-card label="Total Resources" value="{{ total_count }}" />
+            {% endpartialdef dashboard-cards %}
+        </div>
+        <div class="bg-base-100 rounded-xl shadow-lg">
+            <div class="overflow-x-auto">
+                {% partialdef resource-table inline %}
+                    <c-table>
+                        <c-slot name="headers">
+                            <th>Name</th>
+                            <th>ID</th>
+                            <th>Created</th>
+                            <th>Last Modified</th>
+                            <th>Targets</th>
+                            <th>Actions</th>
+                        </c-slot>
+                        <c-slot name="rows">
+                            {% for resource in resources %}
+                                <tr>
+                                    <td>
+                                        <p class="font-medium">{{ resource.resource_name }}</p>
+                                    </td>
+                                    <td>
+                                        <code class="bg-base-200 px-2 py-1 rounded">{{ resource.id }}</code>
+                                    </td>
+                                    <td>
+                                        <div>{{ resource.created_date_time|date:"M d, Y" }}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{ resource.modification_date_time|date:"M d, Y" }}</div>
+                                    </td>
+                                    <td>
+                                        <c-link href="{% url url_prefix|add:'resource-targets' resource.ven_id resource.id %}"
+                                        class="btn btn-sm btn-outline"
+                                        title="To Targets">
+                                            <span class="text-xs">To Targets</span>
+                                        </c-link>
+                                    </td>
+                                    <td>
+                                        <c-actions-field
+                                            :field="resource"
+                                            item_name="Resource"
+                                            :name="resource.name"
+                                            edit_route="{% url url_prefix|add:'resources-edit' resource.ven_id resource.id %}"
+                                            delete_route="{% url url_prefix|add:'resources-delete' resource.ven_id resource.id %}" />
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </c-slot>
+                        <c-slot name="empty">
+                            <p>No Resources found. <c-link href="{% url url_prefix|add:'resources-create' id %}" class="link">Create one now</c-link>.</p>
+                        </c-slot>
+                    </c-table>
+                {% endpartialdef %}
+            </div>
+        </div>
+    </div>
+{% endpartialdef content %}
+{% endblock content %}

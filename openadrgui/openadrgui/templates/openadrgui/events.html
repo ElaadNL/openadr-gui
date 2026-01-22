@@ -1,0 +1,109 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{% extends "base.html" %}
+{% block title %}
+    OpenADR GUI
+{% endblock title %}
+{% block content %}
+{% partialdef content inline %}
+    {% if program_events %}
+        <c-title-bar
+            title="Events"
+        >
+        </c-title-bar>
+    {% else %}
+    <c-title-bar
+        title="Events"
+        link_url="{% url url_prefix|add:'events-create' id %}"
+        link_text="New Event"
+    >
+        <c-slot name="description">
+            <p class="text-sm text-base-content/70">
+                Configure existing OpenADR events on the VTN.
+            </p>
+        </c-slot>
+    </c-title-bar>
+    {% endif %}
+    <div class="col gap-4">
+        <div id="dashboard-cards"
+            class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {% partialdef dashboard-cards inline %}
+                <c-dashboard-card label="Total Events" value="{{ total_count }}" />
+            {% endpartialdef dashboard-cards %}
+        </div>
+        {% if program_is_deployed %}
+            <c-scheduled-deployment-warning item_names="The events below"/>
+        {% endif %}
+        <div class="bg-base-100 rounded-xl shadow-lg {% if program_is_deployed %}border-warning border-2{% endif %}">
+            <div class="overflow-x-auto {% if program_is_deployed %}rounded-xl{% endif %}">
+                {% partialdef events-table inline %}
+                    <c-table>
+                        <c-slot name="headers">
+                            <th>Name</th>
+                            <th>ID</th>
+                            <th>Priority</th>
+                            <th>Interval</th>
+                            <th>To intervals</th>
+                            <th>To targets</th>
+                            <th>Actions</th>
+                        </c-slot>
+                        <c-slot name="rows">
+                            {% for event in events %}
+                                {% firstof event.program_id_id event.program_id as event_program_id %}
+                                <tr>
+                                    <td>
+                                        <p class="font-medium">{{ event.event_name }}</p>
+                                        <p class="text-sm text-base-content/70">{{ event.event_long_name }}</p>
+                                    </td>
+                                    <td>
+                                        <code class="bg-base-200 px-2 py-1 rounded">{{ event.id }}</code>
+                                    </td>
+                                    <td>
+                                        <p>{{ event.priority }}</p>
+                                    </td>
+                                    <td>
+                                        <c-interval-period-field :interval_period="event.interval_period" />
+                                    </td>
+                                    <td>
+                                        <c-link href="{% url url_prefix|add:'intervals' event_program_id event.id %}"
+                                        class="btn btn-sm btn-outline"
+                                        title="To Events">
+                                            <span class="text-xs">To intervals</span>
+                                        </c-link>
+                                    </td>
+                                    <td>
+                                        <c-link href="{% url url_prefix|add:'event-targets' event_program_id event.id %}"
+                                        class="btn btn-sm btn-outline"
+                                        title="To Targets">
+                                            <span class="text-xs">To targets</span>
+                                        </c-link>
+                                    </td>
+                                    <td>
+                                        <c-actions-field
+                                            :field="event"
+                                            item_name="Event"
+                                            :name="event.event_name"
+                                            edit_route="{% url url_prefix|add:'events-edit' event_program_id event.id %}"
+                                            delete_route="{% url url_prefix|add:'events-delete' event_program_id event.id %}" />
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </c-slot>
+                        <c-slot name="empty">
+                            {% if program_events %}
+                                <p>No Events found. <c-link class="link" href="{% url 'programs' %}">Create a new Deployment Package</c-link> and deploy it to the VTN.</p>
+                            {% else %}
+                                <p>No Events found. <c-link class="link" href="{% url url_prefix|add:'events-create' id %}">Create one now</c-link>.</p>
+                            {% endif %}
+                        </c-slot>
+                    </c-table>
+                {% endpartialdef %}
+            </div>
+        </div>
+    </div>
+{% endpartialdef content %}
+{% endblock content %}

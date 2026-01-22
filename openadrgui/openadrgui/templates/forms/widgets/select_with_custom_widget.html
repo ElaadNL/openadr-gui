@@ -1,0 +1,54 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{% load widget_tweaks %}
+{% load template_filters %}
+
+<div x-data="{
+        selectedValue: '{{ widget.subwidgets.0.value.0|default:""|escapejs }}',
+        customValue: '{{ widget.subwidgets.1.value|default:""|escapejs }}',
+        customOptionValue: '{{ custom_value|escapejs }}',
+
+        get isCustomSelected() {
+            return this.selectedValue === this.customOptionValue;
+        },
+
+        clearCustomValue() {
+            if (!this.isCustomSelected) {
+                this.customValue = '';
+            }
+        }
+    }"
+    x-init="$watch('selectedValue', () => clearCustomValue())"
+    id="{{ widget.id_for_label }}"
+    aria-describedby="{{ widget.id_for_label }}_helptext"
+    class="col gap-2">
+
+        <select
+            name="{{ widget.subwidgets.0.name }}"
+            x-model.fill="selectedValue"
+            class="select select-bordered w-full {% if widget.errors %} select-error {% endif %}"
+            {{ widget.attrs|get_dict_item:'disabled'|yesno:'disabled,' }}>
+            {% for option_value, option_label in choices %}
+                <option value="{{ option_value }}"
+                        {% if option_value == widget.subwidgets.0.value.0 %}selected{% endif %}>
+                    {{ option_label }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <div x-show="isCustomSelected">
+            <input
+                type="text"
+                name="{{ widget.subwidgets.1.name }}"
+                x-model.fill="customValue"
+                value="{{ widget.subwidgets.1.value|default:'' }}"
+                placeholder="{{ widget.subwidgets.1.attrs.placeholder|default:'Enter custom value' }}"
+                class="input input-bordered w-full {% if widget.errors %} input-error {% endif %}"
+                {{ widget.attrs|get_dict_item:'disabled'|yesno:'disabled,' }}
+                :required="isCustomSelected">
+        </div>
+</div>

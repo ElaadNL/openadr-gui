@@ -1,0 +1,19 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="row">
+    <c-link href="{{ edit_route }}"
+    class="btn btn-sm btn-outline rounded-r-none border-r-0"
+    title="Edit">
+        <i class="bi bi-pencil"></i>
+    </c-link>
+    <c-delete-form-item-modal
+        :item_name="item_name"
+        :field="field"
+        :name="name"
+        :delete_route="delete_route"
+        :hx_target="hx_target" />
+</div>

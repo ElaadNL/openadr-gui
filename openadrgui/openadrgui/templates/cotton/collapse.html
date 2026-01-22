@@ -1,0 +1,14 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div tabindex="0"
+    x-data="{ isOpening: false }"
+    x-on:focusin="isOpening = true"
+    x-on:click="if(!isOpening) $el.blur(); isOpening = false"
+    class="collapse collapse-arrow border-base-300 bg-base-100 border border-base-300 border cursor-pointer">
+    <div class="collapse-title"> {{ title }} </div>
+    <div class="collapse-content"> {{ content }} </div>
+</div>

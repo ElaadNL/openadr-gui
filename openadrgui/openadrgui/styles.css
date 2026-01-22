@@ -1,0 +1,141 @@
+/*
+ * SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@import "tailwindcss";
+@import "tailwindcss-animated";
+@source "./openadrgui/templates/**/*.html";
+@plugin "daisyui" {
+    themes: light --default;
+}
+@plugin "daisyui/theme" {
+    name: "light";
+    default: true;
+    --color-primary: #007ea4;
+    --color-secondary: #00abd7;
+    --color-accent: #899903;
+    --color-warning-content: --color-black;
+    --color-error-content: --color-black;
+}
+/* https://github.com/mozilla/twemoji-colr */
+@font-face {
+    font-family: 'TwemojiMozilla';
+    src: URL('TwemojiMozilla.ttf') format('truetype');
+}
+@layer base {
+    :root {
+        font-family: "Noto Sans", system-ui, sans-serif;
+    }
+
+    /* Apply TwemojiMozilla for emoji presentation */
+    @supports (font-family: "TwemojiMozilla") {
+        :root {
+            font-family: "Noto Sans", system-ui, sans-serif, "TwemojiMozilla";
+        }
+    }
+}
+
+/* Add HTMX variants */
+@custom-variant htmx-settling {
+    .htmx-settling, .htmx-settling & {
+        @slot;
+    }
+}
+@custom-variant htmx-request {
+    .htmx-request, .htmx-request & {
+        @slot;
+    }
+}
+@custom-variant htmx-swapping {
+    .htmx-swapping, .htmx-swapping & {
+        @slot;
+    }
+}
+@custom-variant htmx-added {
+    .htmx-added, .htmx-added & {
+        @slot;
+    }
+}
+
+/* One layer above base, but overridable by utilities layer */
+@layer components {
+    h1 {
+        @apply font-bold text-4xl;
+    }
+
+    h2 {
+        @apply font-bold text-3xl;
+    }
+
+    h3 {
+        @apply font-bold text-2xl;
+    }
+
+    h4 {
+        @apply font-bold text-xl;
+    }
+    h5 {
+        @apply font-bold text-lg;
+    }
+
+    h6 {
+        @apply text-gray-500 font-bold text-base;
+    }
+    /* Copied disabled styles from output.css: https://github.com/saadeghi/daisyui/discussions/2819 */
+    .input {
+        &:has(> input[readonly]), &:is(:readonly, [readonly]) {
+            cursor: not-allowed;
+            border-color: var(--color-base-200);
+            background-color: var(--color-base-200);
+            color: color-mix(in oklab, var(--color-base-content) 40%, transparent);
+            &::placeholder {
+              color: color-mix(in oklab, var(--color-base-content) 20%, transparent);
+            }
+            box-shadow: none;
+          }
+          &:has(> input[readonly]) > input[readonly] {
+            cursor: not-allowed;
+          }
+          &:has(> textarea[readonly]), &:is(:readonly, [readonly]) {
+            cursor: not-allowed;
+            border-color: var(--color-base-200);
+            background-color: var(--color-base-200);
+            color: color-mix(in oklab, var(--color-base-content) 40%, transparent);
+            &::placeholder {
+              color: color-mix(in oklab, var(--color-base-content) 20%, transparent);
+            }
+            box-shadow: none;
+          }
+          &:has(> textarea[readonly]) > textarea[readonly] {
+            cursor: not-allowed;
+          }
+    }
+    label:has(+ * input[required])::after, /* Targets a label that has a sibling element containing (wraps) a required input */
+    label:has(+ input[required])::after { /* Targets a label that has a required input as a direct sibling */
+        content: "*";
+        color: var(--color-error);
+        margin-left: 0.25rem;
+    }
+}
+
+.input[aria-invalid="true"] {
+    @apply border-2 border-error;
+}
+
+.input[aria-invalid="true"]:focus {
+    @apply outline-2 outline-error;
+}
+
+.row {
+    @apply flex flex-row;
+}
+
+.col {
+    @apply flex flex-col;
+}
+
+.bg-warning-200 {
+    @apply bg-[#fff8e5]
+}

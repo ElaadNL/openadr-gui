@@ -1,0 +1,128 @@
+# SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Docker compose file to test production openadrgui dockerfile locally
+services:
+  openadrgui:
+    build: .
+    container_name: openadrgui
+    volumes:
+      - static_volume:/app/openadrgui/static  # Share static files with Caddy
+    environment:
+    # Django settings
+      - DEBUG=false
+      - TZ
+      - SECRET_KEY
+      - API_URL
+    # OAuth settings (openadr3-client)
+    ## This setting makes sure that oauthlib can connect to the token-hook server
+      - OAUTHLIB_INSECURE_TRANSPORT
+      - OAUTH_CLIENT_ID
+      - OAUTH_CLIENT_SECRET
+      - OAUTH_TOKEN_ENDPOINT
+      - OAUTH_SCOPES
+    # Database settings
+      - DB_NAME
+      - DB_USER
+      - DB_PASSWORD
+      - DB_HOST
+      - DB_PORT
+    # OIDC settings (mozilla-django-oidc)
+      - OIDC_RP_CLIENT_ID
+      - OIDC_RP_CLIENT_SECRET
+      - OIDC_OP_BASE_URL
+    depends_on:
+      db:
+        condition: service_healthy
+      vtn:
+        condition: service_started
+  caddy:
+      image: caddy:latest
+      restart: unless-stopped
+      ports:
+        - "80:80"
+        - "443:443"
+        - "443:443/udp"
+      volumes:
+        - static_volume:/app/openadrgui/static  # Access static files from Django container
+        - ./Caddyfile:/etc/caddy/Caddyfile
+        - ./site:/srv
+        - caddy_data:/data
+        - caddy_config:/config
+  vtn:
+    image: ghcr.io/openleadr/openleadr-rs:latest
+    ports: []
+    environment:
+      RUST_LOG: debug
+      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      # Enable external OAuth validation via Hydra (provided by the devserver services below).
+      OAUTH_TYPE: EXTERNAL
+      OAUTH_JWKS_LOCATION: http://hydra:4444/.well-known/jwks.json
+      OAUTH_KEY_TYPE: RSA
+      OAUTH_VALID_AUDIENCES: "http://localhost:3000,"
+    healthcheck:
+      test: curl --fail http://127.0.0.1:3000/health || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      db:
+        condition: service_healthy
+      hydra:
+        condition: service_started
+      bootstrap:
+        condition: service_started
+  db:
+    image: ghcr.io/tweedegolf/postgres:16
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_HOST_AUTH_METHOD: trust
+      TZ: UTC
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+      - ./init-db:/docker-entrypoint-initdb.d
+
+  # OpenLEADR VTN devserver services
+  token-hook:
+    container_name: token-hook-dev
+    extends:
+      file: ./openleadr-vtn-devserver/docker-compose.yml
+      service: token-hook
+
+  hydra-migrate:
+    container_name: hydra-migrate-dev
+    extends:
+      file: ./openleadr-vtn-devserver/docker-compose.yml
+      service: hydra-migrate
+
+  hydra:
+    container_name: hydra-dev
+    extends:
+      file: ./openleadr-vtn-devserver/docker-compose.yml
+      service: hydra
+
+  bootstrap:
+    container_name: bootstrap-dev
+    volumes:
+      - ./openleadr-vtn-devserver/bootstrap.sh:/app/bootstrap.sh
+      - .:/app/data
+    extends:
+      file: ./openleadr-vtn-devserver/docker-compose.yml
+      service: bootstrap
+
+volumes:
+  static_volume:
+  caddy_data:
+  caddy_config:
+  database-data:
+  hydra-sqlite:

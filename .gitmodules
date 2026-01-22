@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+[submodule "openleadr-vtn-devserver"]
+	path = openleadr-vtn-devserver
+	url = https://github.com/ElaadNL/openleadr-vtn-devserver

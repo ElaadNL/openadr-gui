@@ -1,0 +1,20 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{% extends "base.html" %}
+{% load template_filters %}
+{% block title %}
+    OpenADR GUI
+{% endblock title %}
+{% block content %}
+{% partialdef content inline %}
+    <div class="col gap-4">
+        {% render_partial_with_context "partials/programs-partial.html" api title="Programs (VTN)" description="Configure existing OpenADR programs on the VTN." %}
+        <div class="divider"></div>
+        {% render_partial_with_context "partials/programs-partial.html" dp title="Deployment Packages (DP)" description="Configure existing OpenADR programs as Deployment Packages." %}
+    </div>
+{% endpartialdef content %}
+{% endblock content %}

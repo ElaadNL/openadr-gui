@@ -1,0 +1,21 @@
+{
+  "name": "openadr-gui",
+  "engines": {
+    "node": ">=22.13.0 <23.0.0"
+  },
+  "version": "1.0.0",
+  "description": "This repository holds all sourcefiles and deployment information for the ElaadNL OpenADR backend with GUI.",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.16",
+    "@tailwindcss/typography": "^0.5.16",
+    "daisyui": "^5.3.8",
+    "tailwindcss": "^4.1.16",
+    "tailwindcss-animated": "^2.0.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "css:build": "npx @tailwindcss/cli -i ./openadrgui/openadrgui/styles.css -o ./openadrgui/openadrgui/static/css/output.css --minify",
+    "css:watch": "npx @tailwindcss/cli -i ./openadrgui/openadrgui/styles.css -o ./openadrgui/openadrgui/static/css/output.css --watch"
+  }
+}

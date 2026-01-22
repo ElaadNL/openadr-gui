@@ -1,0 +1,363 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}
+    OpenADR GUI
+{% endblock title %}
+{% block content %}
+{% partialdef content inline %}
+    {% if program_is_deployed %}
+        <c-scheduled-deployment-confirm-modal item_names="intervals and payload descriptors" program_name="{{ program_name }}" />
+    {% endif %}
+    <div class="col gap-4">
+        <div class="row gap-2 items-center">
+            <div role="tablist" class="tabs tabs-box tabs-md w-fit">
+                {% for tab in available_tabs %}
+                    {% if tab.type.value != "Add" %}
+                    <div role="tab" class="tab row gap-2 pr-0 {% if tab.active %}tab-active{% endif %}">
+                        <a
+                            {% if not tab.active %}
+                                href="{% url url_prefix|add:'intervals-payload' program_id id tab.type.value %}"
+                                hx-boost="true"
+                            {% endif %}>
+                            <span>
+                                {{ tab.display_name }}
+                            </span>
+                            <i class="bi bi-arrow-repeat htmx-indicator animate-spin inline-block"></i>
+                        </a>
+                        <div class="cursor-auto">
+                            <c-delete-form-item-modal
+                                item_name="Payload Descriptor"
+                                name="{{ tab.display_name }}"
+                                >
+                                <c-slot name="button">
+                                    <button @click.prevent="showModal" class="btn btn-ghost">
+                                        {% if button %}
+                                            {{ button }}
+                                        {% else %}
+                                            <i class="bi bi-trash text-error"></i>
+                                        {% endif %}
+                                    </button>
+                                </c-slot>
+                                <c-slot name="warning_description">
+                                    <p>This will also delete all intervals associated with the payload descriptor.</p>
+                                </c-slot>
+                                <c-slot name="delete_button">
+                                    <button type="button"
+                                        hx-disabled-elt="this"
+                                        hx-delete="{% url url_prefix|add:'intervals-payload' program_id id tab.type.value %}"
+                                        hx-swap="none"
+                                        class="btn btn-error">
+                                    <i class="bi bi-trash me-1"></i>
+                                        Delete
+                                </button>
+                                </c-slot>
+                            </c-delete-form-item-modal>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div role="tablist" class="tabs">
+                {% for tab in available_tabs %}{% if tab.type.value == "Add" %}
+                    <a role="tab"
+                    class="row gap-2 tab {% if tab.active %}tab-active{% endif %}"
+                    href="{% url url_prefix|add:'intervals-payload' program_id id tab.type.value %}"
+                    hx-boost="true">
+                        <i class="bi bi-plus-circle-dotted"></i>
+                    </a>
+                {% endif %}{% endfor %}
+            </div>
+        </div>
+        <div id="intervals-content">
+            {% if current_payload_type == "Add" %}
+                <!-- Add Payload Form -->
+                <div class="col gap-4 items-center">
+                    <div class="card bg-base-100 max-w-prose">
+                        <div class="card-body">
+                            <h2 class="card-title">Add New Payload Descriptor</h2>
+                            {% partialdef payload-descriptor-form inline %}
+                                {% url url_prefix|add:'payload-descriptor' program_id id 'Add' as payload_descriptor_url %}
+                                <c-payload-descriptor-form id="payload-descriptor" :url="payload_descriptor_url" no-back-button></c-payload-descriptor-form>
+                            {% endpartialdef payload-descriptor-form %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Regular Intervals View -->
+                <div id="intervals-data" class="h-[70vh]">
+                <canvas
+                    x-data="{
+                        ctx: null,
+
+                        getData() {
+                            const rawData = document.getElementById('data').textContent.trim();
+                            if (!rawData || rawData === 'null') {
+                                console.warn('No data found or data is empty');
+                                return [];
+                            }
+                            const data = JSON.parse(rawData);
+
+                            return data;
+                        },
+
+                        getTimeUnit(data) {
+                            // Default to minute for empty datasets
+                            if (data.length === 0) {
+                                return 'minute';
+                            }
+
+                            // Calculate the time span of the dataset
+                            const firstTimestamp = new Date(data[0].x).getTime();
+                            const lastTimestamp = new Date(data[data.length - 1].x).getTime();
+
+                            // Convert to hours for easier comparison
+                            const HOURS_IN_MS = 1000 * 60 * 60;
+                            const timeSpanInHours = (lastTimestamp - firstTimestamp) / HOURS_IN_MS;
+
+                            // Determine appropriate time unit based on data span
+                            const ONE_WEEK_IN_HOURS = 24 * 7;
+                            const ONE_DAY_IN_HOURS = 24;
+
+                            if (timeSpanInHours > ONE_WEEK_IN_HOURS) {
+                                return 'day';
+                            } else if (timeSpanInHours > ONE_DAY_IN_HOURS) {
+                                return 'hour';
+                            } else {
+                                return 'minute';
+                            }
+                        },
+
+                        getConfig(data, is_decimated) {
+                            const timeUnit = this.getTimeUnit(data);
+
+                            return {
+                                type: 'line',
+                                data: {
+                                    labels: data.map(d => d.x),
+                                    datasets: [{
+                                        label: '{{ current_payload_type_display_name|default:"" }}',
+                                        data: data.map(d => d.y),
+                                        borderColor: 'rgba(0, 126, 164)',
+                                        backgroundColor: 'rgba(0, 126, 164, 0.1)',
+                                        fill: true,
+                                        stepped: data.length > 2 ? 'before' : false,
+                                        pointRadius: is_decimated ? 0 : 3,
+                                        pointHoverRadius: is_decimated ? 0 : 5,
+                                    }]
+                                },
+                                parsing: false,
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    interaction: {
+                                        intersect: false,
+                                        mode: 'index'
+                                    },
+                                    plugins: {
+                                        tooltip: {
+                                            enabled: !is_decimated
+                                        },
+                                        legend: {
+                                            display: false
+                                        }
+                                    },
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            ticks: {
+                                                callback: function(value) {
+                                                    return value.toFixed(1);
+                                                },
+                                                maxTicksLimit: 10
+                                            },
+                                            grace: '10%'
+                                        },
+                                        x: {
+                                            type: 'time',
+                                            time: {
+                                                unit: timeUnit,
+                                                displayFormats: {
+                                                    'minute': 'dd/LL HH:mm',
+                                                    'hour': 'dd/LL HH:mm',
+                                                    'day': 'dd/LL'
+                                                }
+                                            },
+                                            ticks: {
+                                                source: 'data',
+                                                autoSkip: true,
+                                                maxTicksLimit: 20
+                                            },
+                                            adapters: {
+                                                date: {
+                                                    locale: 'nl',
+                                                    zone: 'Europe/Amsterdam'
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            };
+                        },
+                    }"
+                    x-on:chart:refresh.window="() => {
+                        const { data, is_decimated } = getData();
+
+                        // Regenerate complete configuration with new data
+                        const newConfig = getConfig(data, is_decimated);
+
+                        // Update data
+                        this.ctx.data = newConfig.data;
+
+                        // Update all options including tooltips, point radius, etc.
+                        this.ctx.options = newConfig.options;
+
+                        this.ctx.update('default');
+                    }"
+                    x-init="$nextTick(() => {
+                        const plugin = {
+                            id: 'emptyChart',
+                            afterDraw(chart, args, options) {
+                                const { datasets } = chart.data;
+                                if (datasets[0].data.length === 0) {
+                                    const { chartArea: { left, top, right, bottom }, ctx } = chart;
+                                    const centerX = (left + right) / 2;
+                                    const centerY = (top + bottom) / 2;
+
+                                    ctx.save();
+                                    // Using Tailwind's text-gray-500 color
+                                    ctx.fillStyle = '#6b7280';
+                                    // Using Tailwind's text-2xl and font-medium
+                                    ctx.font = '600 24px system-ui, -apple-system, sans-serif';
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'middle';
+                                    ctx.fillText('No data to display', centerX, centerY);
+
+                                    // Adding a subtitle with Tailwind's text-gray-400
+                                    ctx.fillStyle = '#9ca3af';
+                                    // Using Tailwind's text-sm
+                                    ctx.font = '400 14px system-ui, -apple-system, sans-serif';
+                                    ctx.fillText('No data to display. Please generate a curve, import data or filter on a time range with data.', centerX, centerY + 30);
+                                    ctx.restore();
+                                }
+                            }
+                        };
+
+                        Chart.register(plugin);
+
+                        const { data, is_decimated } = getData();
+
+                        this.ctx = new Chart($el, getConfig(data, is_decimated));
+                    })"
+                    x-destroy="() => {
+                        this.ctx.destroy();
+                    }"></canvas>
+            </div>
+            <div class="row justify-center">
+                <div class="flex flex-col lg:flex-row justify-between gap-8">
+                    {% partialdef filter-intervals-form inline %}
+                    <div id="filter-intervals-form">
+                        <div class="row gap-2">
+                            {# URL is pushed server side #}
+                            <form
+                            hx-get="{% url url_prefix|add:'intervals-payload' program_id id current_payload_type %}"
+                            hx-target="#filter-intervals-form"
+                            hx-disabled-elt="find button[type='submit']"
+                            novalidate
+                            {# Prevent browser from keeping the previous values. #}
+                            autocomplete="off"
+                            class="row gap-2">
+                                <div>
+                                    <div class="flex flex-col gap-4">
+                                        {% for field in filter_intervals_form %}
+                                            <c-form-field render_labels=False :field=field />
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <c-form-errors :form=filter_intervals_form />
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary"
+                                    {{ filter_intervals_form.disabled|yesno:'disabled,' }}>
+                                    <p>
+                                        <i class="bi bi-funnel"></i>
+                                        Filter
+                                    </p>
+                                    <i class="bi bi-arrow-repeat animate-spin htmx-indicator"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endpartialdef filter-intervals-form %}
+                    <div class="row gap-2">
+                        <c-modal title="Generate Curve">
+                            <c-slot name="button">
+                                <div id="generate-curve-button">
+                                    {% partialdef generate-curve-button inline %}
+                                        <button
+                                            type="button"
+                                            @click.prevent="showModal"
+                                            class="btn btn-primary"
+                                            {{ payload_empty|yesno:'disabled,' }}>
+                                            <i class="bi bi-graph-up-arrow"></i>
+                                            <span>Generate Curve</span>
+                                        </button>
+                                    {% endpartialdef generate-curve-button %}
+                                </div>
+                            </c-slot>
+                            <c-slot name="modal_content">
+                                {% partialdef generate-curve-form inline %}
+                                    {% url url_prefix|add:'generate-interval-curve' program_id id current_payload_type as generate_curve_url %}
+                                    <c-generate-curve-form id="generate-curve" :url="generate_curve_url"></c-generate-curve-form>
+                                {% endpartialdef generate-curve-form %}
+                            </c-slot>
+                        </c-modal>
+                        <c-modal title="Import CSV">
+                            <c-slot name="button">
+                                <div id="import-csv-button">
+                                    {% partialdef import-csv-button inline %}
+                                        <button
+                                            type="button"
+                                            @click.prevent="showModal"
+                                            class="btn btn-primary"
+                                            {{ payload_empty|yesno:'disabled,' }}>
+                                            <i class="bi bi-file-earmark-arrow-down"></i>
+                                            <span>Import CSV</span>
+                                        </button>
+                                    {% endpartialdef import-csv-button %}
+                                </div>
+                            </c-slot>
+                            <c-slot name="modal_content">
+                                {% partialdef import-csv-form inline %}
+                                    {% url url_prefix|add:'import-csv' program_id id current_payload_type as import_csv_url %}
+                                    <c-import-csv-form id="import-csv" :url="import_csv_url"></c-import-csv-form>
+                                {% endpartialdef import-csv-form %}
+                            </c-slot>
+                        </c-modal>
+                        <c-modal title="Edit signal">
+                            <c-slot name="button_icon">
+                                <i class="bi bi-pencil-square"></i>
+                            </c-slot>
+                            <c-slot name="modal_content">
+                                {% partialdef payload-descriptor-form inline %}
+                                    {% url url_prefix|add:'payload-descriptor' program_id id current_payload_type as payload_descriptor_url %}
+                                    <c-payload-descriptor-form id="payload-descriptor" :url="payload_descriptor_url"></c-payload-descriptor-form>
+                                {% endpartialdef payload-descriptor-form %}
+                            </c-slot>
+                        </c-modal>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        </div>
+    </div>
+    <script id="data" type="application/json">
+        {{ graph_data|safe }}
+    </script>
+{% endpartialdef content %}
+{% endblock content %}

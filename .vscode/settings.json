@@ -1,0 +1,10 @@
+{
+    "python.testing.pytestArgs": [
+        "openadrgui"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    // Disable Basedpyright checking in favor of mypy and Ruff
+    "cursorpyright.analysis.typeCheckingMode": "off",
+    "cursorpyright.analysis.ignore": ["*"]
+}

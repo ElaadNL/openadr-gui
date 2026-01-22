@@ -1,0 +1,47 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{% extends "forms/widgets/date_range_widget.html" %}
+
+{% block x_data_extra %}
+        startTime: null,
+        endTime: null,
+{% endblock x_data_extra %}
+
+{% block display_text_extra %}
+                startText += ' ' + (this.startTime || '');
+                endText += ' ' + (this.endTime || '');
+{% endblock display_text_extra %}
+
+{% block clear_values_extra %}
+    this.startTime = '';
+    this.endTime = '';
+{% endblock clear_values_extra %}
+
+{% block extra_content %}
+    <div class="flex flex-row gap-2">
+        <div class="col gap-2 flex-1">
+            <label for="{{ widget.id_for_label }}_start_time">Start time</label>
+            <input
+                name="{{ widget.subwidgets.2.name }}"
+                type="time"
+                step="1"
+                class="input w-full"
+                value="{{ widget.subwidgets.2.value|default:'' }}"
+                x-model.fill="startTime">
+        </div>
+        <div class="col gap-2 flex-1">
+            <label for="{{ widget.id_for_label }}_end_time">End time</label>
+            <input
+                name="{{ widget.subwidgets.3.name }}"
+                type="time"
+                step="1"
+                class="input w-full"
+                value="{{ widget.subwidgets.3.value|default:'' }}"
+                x-model.fill="endTime">
+        </div>
+    </div>
+{% endblock extra_content %}

@@ -1,0 +1,55 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+{% extends "base.html" %}
+{% block extra_head %}
+{% endblock extra_head %}
+{% load widget_tweaks %}
+{% block title %}
+    {% if form.id %}
+        Edit
+    {% else %}
+        New
+    {% endif %}
+    Resource
+{% endblock title %}
+{% block content %}
+    {% partialdef content inline %}
+    <div class="max-w-prose mx-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold">
+                {% if form.id %}
+                    Edit
+                {% else %}
+                    New
+                {% endif %}
+                Resource
+            </h1>
+        </div>
+        <div>
+            <div>
+                <form method="post"
+                    enctype="multipart/form-data"
+                    novalidate>
+                    {% csrf_token %}
+                    <div>
+                        <div class="flex flex-col gap-4">
+                            {% for field in form %}
+                                <c-form-field :field=field />
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <c-form-errors :form=form />
+                    <div class="mt-6 flex gap-2">
+                        <button type="submit" class="btn btn-primary">Save Resource</button>
+                        <c-link href="{{ back_url }}" class="btn btn-ghost">Back</c-link>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endpartialdef content %}
+{% endblock content %}

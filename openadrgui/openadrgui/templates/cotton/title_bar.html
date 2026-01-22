@@ -1,0 +1,26 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="flex flex-col gap-4 pl-3">
+    <div class="flex flex-wrap justify-between items-center gap-3">
+        <h1 class="text-2xl font-semibold m-0">
+            {{ title }}
+            <c-link href="{{ request.path }}">
+                {# djlint:off #}
+                <i class="text-primary hover:text-primary-focus bi bi-arrow-clockwise
+                inline-block htmx-added:ease-in-out htmx-added:animate-spin htmx-added:animate-once htmx-added:animate-duration-[500ms]"></i>
+                {# djlint:on #}
+            </c-link>
+        </h1>
+
+        {% if link_url and link_text %}
+            <c-link href="{{ link_url }}" class="btn btn-primary">
+                <i class="bi bi-plus"></i> {{ link_text }}
+            </c-link>
+        {% endif %}
+    </div>
+    {{ description }}
+</div>

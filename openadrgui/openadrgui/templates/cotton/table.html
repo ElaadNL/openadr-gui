@@ -1,0 +1,24 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<table class="table table-zebra w-full" id="{{ id }}">
+    <thead class="bg-base-200">
+        <tr>
+            {{ headers }}
+        </tr>
+    </thead>
+    {# Classes are such that we don't need to add them to the rows directly #}
+    <tbody class="
+        [&>tr:not(:last-child)>td:first-child]:pl-4
+        [&>tr:not(:last-child)>td:last-child]:pe-3">
+        {{ rows }}
+        <tr class="hidden [tbody_>_&:first-child]:table-row">
+            <td colspan="7" class="text-center py-4">
+                {{ empty }}
+            </td>
+        </tr>
+    </tbody>
+</table>

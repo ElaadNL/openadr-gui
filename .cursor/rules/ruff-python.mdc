@@ -1,0 +1,11 @@
+<!--
+SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+---
+description:
+globs:
+---
+This project uses a very strict Ruff linting setting. Follow Ruff guidelines whereever possible, including but not limited to using double quotes for strings.

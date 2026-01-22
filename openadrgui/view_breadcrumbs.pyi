@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: Contributors to openadr3-client <https://github.com/ElaadNL/openadr3-client>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+type Crumb = tuple[str, str | None]
+
+class BaseBreadcrumbMixin:
+    _breadcrumbs: list[Crumb]
+
+    @property
+    def crumbs(self) -> list[Crumb]: ...
+
+class ListBreadcrumbMixin(BaseBreadcrumbMixin): ...
+class CreateBreadcrumbMixin(BaseBreadcrumbMixin): ...
+class UpdateBreadcrumbMixin(BaseBreadcrumbMixin): ...
+class DeleteBreadcrumbMixin(BaseBreadcrumbMixin): ...

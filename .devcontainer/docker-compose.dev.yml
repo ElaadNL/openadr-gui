@@ -1,0 +1,80 @@
+# SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/openadr-gui>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  db:
+    container_name: db-dev
+    extends:
+      file: ../openleadr-vtn-devserver/docker-compose.yml
+      service: db
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_HOST_AUTH_METHOD: trust
+      TZ: UTC
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+
+  token-hook:
+    container_name: token-hook-dev
+    extends:
+      file: ../openleadr-vtn-devserver/docker-compose.yml
+      service: token-hook
+
+  hydra-migrate:
+    container_name: hydra-migrate-dev
+    extends:
+      file: ../openleadr-vtn-devserver/docker-compose.yml
+      service: hydra-migrate
+
+  hydra:
+    container_name: hydra-dev
+    extends:
+      file: ../openleadr-vtn-devserver/docker-compose.yml
+      service: hydra
+
+  vtn:
+    container_name: vtn-dev
+    environment:
+      RUST_LOG: trace
+      DATABASE_URL: postgres://$DB_USER:$DB_PASSWORD@db:5432/$DB_NAME
+      OAUTH_TYPE: EXTERNAL
+      OAUTH_JWKS_LOCATION: http://hydra:4444/.well-known/jwks.json
+      OAUTH_KEY_TYPE: RSA
+      OAUTH_VALID_AUDIENCES: "http://localhost:3000,"
+      RUST_BACKTRACE: 1
+    extends:
+      file: ../openleadr-vtn-devserver/docker-compose.yml
+      service: vtn
+    ports:
+      # Cannot use !override here, since it does not work with devcontainer.
+      # It is not neccessarry though, since [] + [3000:3000] = [3000:3000]
+      - "3000:3000"
+
+  bootstrap:
+    container_name: bootstrap-dev
+    volumes:
+      - ../openleadr-vtn-devserver/bootstrap.sh:/app/bootstrap.sh
+      - ../:/app/data
+    extends:
+      file: ../openleadr-vtn-devserver/docker-compose.yml
+      service: bootstrap
+
+  openadrgui-dev:
+    build: .
+    container_name: openadrgui-dev
+    volumes:
+      - ..:/workspace:cached
+
+volumes:
+  database-data:
+  hydra-sqlite:
