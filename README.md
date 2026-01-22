@@ -4,6 +4,12 @@ SPDX-FileCopyrightText: Contributors to openadr-gui<https://github.com/ElaadNL/o
 SPDX-License-Identifier: Apache-2.0
 -->
 
+[![CodeQL Advanced](https://github.com/ElaadNL/openadr-gui/actions/workflows/codeql.yml/badge.svg)](https://github.com/ElaadNL/openadr-gui/actions/workflows/codeql.yml)
+[![Python Default CI](https://github.com/ElaadNL/openadr-gui/actions/workflows/ci.yml/badge.svg)](https://github.com/ElaadNL/openadr-gui/actions/workflows/ci.yml)
+![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2FElaadNL%2Fopenadr-gui%2Frefs%2Fheads%2Fmain%2Fpyproject.toml)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
+
 # OpenADR GUI
 
 This repository holds all sourcefiles and deployment information for the ElaadNL OpenADR backend with GUI.
