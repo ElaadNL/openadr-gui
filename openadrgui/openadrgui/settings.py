@@ -83,7 +83,6 @@ env = environ.Env(
     DB_PORT=(str, "PLEASESETDBPORT"),
     # OIDC
     OIDC_RP_CLIENT_ID=(str, environ.Env.NOTSET),
-    OIDC_RP_CLIENT_SECRET=(str, environ.Env.NOTSET),
     OIDC_OP_BASE_URL=(str, environ.Env.NOTSET),
     CSRF_TRUSTED_ORIGINS=(str, "https://localhost,http://localhost,http://localhost:8000"),
 )
@@ -121,7 +120,6 @@ if is_test_context() or is_runtime_context():
     TIME_ZONE = env("TZ")
     OIDC_OP_AUTHORIZATION_ENDPOINT = "MOCK_AUTHORIZATION_ENDPOINT"
     OIDC_RP_CLIENT_ID = "MOCK_CLIENT_ID"
-    OIDC_RP_CLIENT_SECRET = "MOCK_CLIENT_SECRET"  # noqa: S105 #nosec B105
     OIDC_OP_BASE_URL = "MOCK_OP_BASE_URL"
 
 # Only require these when running the actual server
@@ -134,7 +132,7 @@ if is_runtime_context() and not is_test_context():
     OAUTH_TOKEN_ENDPOINT = env("OAUTH_TOKEN_ENDPOINT")
     OAUTH_SCOPES = env("OAUTH_SCOPES").split(",") if env("OAUTH_SCOPES") else []
     OIDC_RP_CLIENT_ID = env("OIDC_RP_CLIENT_ID")
-    OIDC_RP_CLIENT_SECRET = env("OIDC_RP_CLIENT_SECRET")
+    OIDC_RP_CLIENT_SECRET = "DUMMY_VALUE_FOR_MOZILLA_OIDC"
     OIDC_OP_BASE_URL = env("OIDC_OP_BASE_URL")
 
     OIDC_OP_CONFIG_URL = f"{OIDC_OP_BASE_URL}/.well-known/openid-configuration"
