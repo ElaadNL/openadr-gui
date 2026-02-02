@@ -6,7 +6,24 @@ SPDX-License-Identifier: Apache-2.0
 
 # OpenADR GUI
 
-This repository holds all sourcefiles and deployment information for the ElaadNL OpenADR backend with GUI.
+OpenADR GUI is a graphical user interface for interacting with OpenADR VTN servers. The application is especially useful for setting up and managing small scale deployments, tests and pilots.
+
+Features include:
+- Managing all OpenADR resources through an intuitive interface (VEN, resources, programs, events including intervals and payloads).
+  - At the moment, reports and subscriptions are not supported.
+- Intuitive viewing of intervals: view intervals graphically, including filtering on dates.
+- Uploading intervals in a simplified CSV format for a given event: set everything up in a GUI, only import the timestamps.
+- Generating intervals for a given event: especially useful for tests and pilots.
+- Prepare your program locally and deploy it to a VTN in one go.
+- Simulate dynamic programs with a static program: prepare intervals for a single week and repeat them automatically.
+- OAUTH OIDC: secure OpenADRGUI with an identity and access management solution of your choice.
+
+<img width="500" alt="openadrgui-screenshot-2" src="https://github.com/user-attachments/assets/049120c8-9ee1-4a5b-b5d0-96bda656520f" />
+<img width="500" alt="openadrgui-screenshot-1" src="https://github.com/user-attachments/assets/75631ba9-1b58-4464-81ba-c4704ff75ace" />
+
+## VTN server
+
+This project is developed with [OpenLEADR-rs](https://github.com/OpenLEADR/openleadr-rs) in mind, and we highly recommend using OpenLEADR-rs if you are looking to set up a VTN server of your own.
 
 ## Docker compose: local test of production dockerfile
 
@@ -132,13 +149,13 @@ The OpenADR GUI stack was chosen with the following goals in mind:
 OpenADR GUI uses the [Hypermedia Driven Architecture (HDA)](https://htmx.org/essays/hypermedia-driven-applications/) to build the GUI. HDA combines the simplicity & flexibility of traditional Multi-Page Applications (MPAs) with the better user experience of Single-Page Applications (SPAs). This means that, instead of the frontend recieving data, the frontend recieves HTML responses that are placed as is in the DOM. To achieve this, the GUI uses the following technologies:
 - [HTMX](https://htmx.org/): A library that allows you to use HTML as your templating language and add interactivity to your pages without JavaScript.
 - [Alpine.js](https://alpinejs.dev/): "Modern JQuery"; A lightweight and simple JavaScript framework that allows you to add interactivity to your pages without writing JavaScript: fills in the gaps where HTMX doesn't cover.
-- [TailwindCSS](https://tailwindcss.com/) + [Flowbite](https://flowbite.com/): A utility-first CSS framework that allows you to build custom designs without writing custom CSS. Flowbite is a library of components that you can use to build your own design system.
+- [TailwindCSS](https://tailwindcss.com/) + [DaisyUI](https://daisyui.com/): A utility-first CSS framework that allows you to build custom designs without writing custom CSS.
     - [TailwindCSS Animated](https://www.tailwindcss-animated.com): A more complete library of animations for TailwindCSS. Use [The builder](https://www.tailwindcss-animated.com/configurator.html) to generate the classes for your animations. When using delays, add the class on x-init (see messages-partial.html).
 - [Django-cotton](https://django-cotton.com/): A library that brings component-based design to Django.
 - [Python](https://www.python.org/): The backend is written in Python and uses the [Django](https://www.djangoproject.com/) framework.
-- [Poetry](https://python-poetry.org/): A tool for dependency management and packaging in Python.
+- [UV](https://docs.astral.sh/uv/): A tool for dependency management in Python.
 
-## Helpfull material on HDA applications
+## Helpful material on HDA applications
 
 - [This video](https://youtu.be/akd7u69k27k?si=oDyXmeNBSDbYVJvB) is a great introduction to the HDA approach. It uses DaisyUI instead of Flowbite and Django-template-partials instead of Django-cotton, but the principles are the same.
 - [This essay](https://htmx.org/essays/hypermedia-friendly-scripting/) explains one of the things that you run into with HDA applications: how to do scripting/how to integrate "client-side-first" libraries. Especially this quote is useful:
@@ -158,3 +175,15 @@ This project is licensed under the Apache-2.0 - see LICENSE for details.
 
 This project includes third-party libraries, which are licensed under their own respective Open-Source licenses.
 SPDX-License-Identifier headers are used to show which license is applicable. The concerning license files can be found in the LICENSES directory.
+
+---
+
+## About ElaadNL
+
+OpenADRGUI is built by ElaadNL, with the goal of using it for both internal projects as well as those of stakeholders.
+
+ElaadNL is a Dutch research institute founded and funded by the Dutch District Service Operators (DSOs). ElaadNL was originally tasked by the DSOs to kickstart and foster the adoption of Electric Vehicles by installing the first Dutch charging stations, as well as monitoring the effects EVs have on the grid.
+
+A major result of this pioneering work, was the creation of the Open Charge Point Protocol (OCPP), which today is the de-facto standard for CPOs to communicate with and manage their chargepoints. The protocol is now managed in a spin-off organization: the Open Charge Alliance, which is still closely connected with ElaadNL.
+
+Whereas ElaadNL initially focused mainly on EVs, it has now expanded its mandate to include residential energy use with the goal of increasing the adoption of demand response measures. The reason for this move is to improve efficient use of the resources of the DSO in order to reduce grid congestion, which is a major problem challenge for the Dutch DSOs as well as society as a whole.
