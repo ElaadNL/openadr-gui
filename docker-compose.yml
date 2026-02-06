@@ -30,7 +30,6 @@ services:
       - DB_PORT
     # OIDC settings (mozilla-django-oidc)
       - OIDC_RP_CLIENT_ID
-      - OIDC_RP_CLIENT_SECRET
       - OIDC_OP_BASE_URL
     depends_on:
       db:
@@ -110,6 +109,12 @@ services:
     extends:
       file: ./openleadr-vtn-devserver/docker-compose.yml
       service: hydra
+
+  hydra-login-consent:
+    container_name: hydra-login-consent-dev
+    extends:
+      file: ./openleadr-vtn-devserver/docker-compose.yml
+      service: hydra-login-consent
 
   bootstrap:
     container_name: bootstrap-dev

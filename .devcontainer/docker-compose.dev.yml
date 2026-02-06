@@ -35,12 +35,22 @@ services:
     extends:
       file: ../openleadr-vtn-devserver/docker-compose.yml
       service: hydra-migrate
+    environment:
+      - DSN=postgres://$DB_USER:$DB_PASSWORD@db:5432/$DB_NAME?sslmode=disable&max_conns=20&max_idle_conns=4
 
   hydra:
     container_name: hydra-dev
     extends:
       file: ../openleadr-vtn-devserver/docker-compose.yml
       service: hydra
+    environment:
+      - DSN=postgres://$DB_USER:$DB_PASSWORD@db:5432/$DB_NAME?sslmode=disable&max_conns=20&max_idle_conns=4
+
+  hydra-login-consent:
+    container_name: hydra-login-consent-dev
+    extends:
+      file: ../openleadr-vtn-devserver/docker-compose.yml
+      service: hydra-login-consent
 
   vtn:
     container_name: vtn-dev

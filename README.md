@@ -68,7 +68,6 @@ API_URL=http://vtn:3000
 CLIENT_ID=
 CLIENT_SECRET=
 OIDC_RP_CLIENT_ID=
-OIDC_RP_CLIENT_SECRET=
 OIDC_OP_BASE_URL=
 ```
 
@@ -79,8 +78,7 @@ provider:
   as `https://login.microsoftonline.com/<tenant>/v2.0`. The GUI will fetch the
   actual authorization, token and userinfo endpoints from the
   `/.well-known/openid-configuration` document of that base URL. Provide the
-  client ID and secret of your app registration in `OIDC_RP_CLIENT_ID` and
-  `OIDC_RP_CLIENT_SECRET`.
+  client ID and secret of your app registration in `OIDC_RP_CLIENT_ID`
 
 - **Other providers** - For now, only Entra has been used for this application. The implementation should be fairly generic, but if something does not work, please file a bug report and feel free to expand the README.
 
