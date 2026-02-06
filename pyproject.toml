@@ -39,6 +39,7 @@ dependencies = [
     "huey (>=2.5.4,<3.0.0)",
     "django-lockmgr (>=2.0.0,<3.0.0)",
     "huey-django-orm (>=24.10.24.0,<25.0.0.0)",
+    "urllib3[brotli]>=2.6.3",
 ]
 
 [dependency-groups]

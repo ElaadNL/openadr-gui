@@ -91,6 +91,22 @@ wheels = [
 ]
 
 [[package]]
+name = "brotlicffi"
+version = "1.2.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cffi" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/84/85/57c314a6b35336efbbdc13e5fc9ae13f6b60a0647cfa7c1221178ac6d8ae/brotlicffi-1.2.0.0.tar.gz", hash = "sha256:34345d8d1f9d534fcac2249e57a4c3c8801a33c9942ff9f8574f67a175e17adb", size = 476682, upload-time = "2025-11-21T18:17:57.334Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e4/df/a72b284d8c7bef0ed5756b41c2eb7d0219a1dd6ac6762f1c7bdbc31ef3af/brotlicffi-1.2.0.0-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:9458d08a7ccde8e3c0afedbf2c70a8263227a68dea5ab13590593f4c0a4fd5f4", size = 432340, upload-time = "2025-11-21T18:17:42.277Z" },
+    { url = "https://files.pythonhosted.org/packages/74/2b/cc55a2d1d6fb4f5d458fba44a3d3f91fb4320aa14145799fd3a996af0686/brotlicffi-1.2.0.0-cp38-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:84e3d0020cf1bd8b8131f4a07819edee9f283721566fe044a20ec792ca8fd8b7", size = 1534002, upload-time = "2025-11-21T18:17:43.746Z" },
+    { url = "https://files.pythonhosted.org/packages/e4/9c/d51486bf366fc7d6735f0e46b5b96ca58dc005b250263525a1eea3cd5d21/brotlicffi-1.2.0.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:33cfb408d0cff64cd50bef268c0fed397c46fbb53944aa37264148614a62e990", size = 1536547, upload-time = "2025-11-21T18:17:45.729Z" },
+    { url = "https://files.pythonhosted.org/packages/1b/37/293a9a0a7caf17e6e657668bebb92dfe730305999fe8c0e2703b8888789c/brotlicffi-1.2.0.0-cp38-abi3-win32.whl", hash = "sha256:23e5c912fdc6fd37143203820230374d24babd078fc054e18070a647118158f6", size = 343085, upload-time = "2025-11-21T18:17:48.887Z" },
+    { url = "https://files.pythonhosted.org/packages/07/6b/6e92009df3b8b7272f85a0992b306b61c34b7ea1c4776643746e61c380ac/brotlicffi-1.2.0.0-cp38-abi3-win_amd64.whl", hash = "sha256:f139a7cdfe4ae7859513067b736eb44d19fae1186f9e99370092f6915216451b", size = 378586, upload-time = "2025-11-21T18:17:50.531Z" },
+]
+
+[[package]]
 name = "certifi"
 version = "2025.11.12"
 source = { registry = "https://pypi.org/simple" }
@@ -950,6 +966,7 @@ dependencies = [
     { name = "psycopg", extra = ["c"] },
     { name = "pycountry" },
     { name = "pydantic" },
+    { name = "urllib3", extra = ["brotli"] },
     { name = "whitenoise", extra = ["brotli"] },
 ]
 
@@ -998,6 +1015,7 @@ requires-dist = [
     { name = "psycopg", extras = ["c"] },
     { name = "pycountry", specifier = ">=24.6.1,<25.0.0" },
     { name = "pydantic", specifier = ">=2.11.7,<3.0.0" },
+    { name = "urllib3", extras = ["brotli"], specifier = ">=2.6.3" },
     { name = "whitenoise", extras = ["brotli"], specifier = ">=6.9.0,<7.0.0" },
 ]
 
@@ -1850,11 +1868,17 @@ wheels = [
 
 [[package]]
 name = "urllib3"
-version = "2.5.0"
+version = "2.6.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/15/22/9ee70a2574a4f4599c47dd506532914ce044817c7752a79b6a51286319bc/urllib3-2.5.0.tar.gz", hash = "sha256:3fc47733c7e419d4bc3f6b3dc2b4f890bb743906a30d56ba4a5bfa4bbff92760", size = 393185, upload-time = "2025-06-18T14:07:41.644Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c7/24/5f1b3bdffd70275f6661c76461e25f024d5a38a46f04aaca912426a2b1d3/urllib3-2.6.3.tar.gz", hash = "sha256:1b62b6884944a57dbe321509ab94fd4d3b307075e0c2eae991ac71ee15ad38ed", size = 435556, upload-time = "2026-01-07T16:24:43.925Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a7/c2/fe1e52489ae3122415c51f387e221dd0773709bad6c6cdaa599e8a2c5185/urllib3-2.5.0-py3-none-any.whl", hash = "sha256:e6b01673c0fa6a13e374b50871808eb3bf7046c4b125b216f6bf1cc604cff0dc", size = 129795, upload-time = "2025-06-18T14:07:40.39Z" },
+    { url = "https://files.pythonhosted.org/packages/39/08/aaaad47bc4e9dc8c725e68f9d04865dbcb2052843ff09c97b08904852d84/urllib3-2.6.3-py3-none-any.whl", hash = "sha256:bf272323e553dfb2e87d9bfd225ca7b0f467b919d7bbd355436d3fd37cb0acd4", size = 131584, upload-time = "2026-01-07T16:24:42.685Z" },
+]
+
+[package.optional-dependencies]
+brotli = [
+    { name = "brotli", marker = "platform_python_implementation == 'CPython'" },
+    { name = "brotlicffi", marker = "platform_python_implementation != 'CPython'" },
 ]
 
 [[package]]
